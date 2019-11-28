@@ -1,0 +1,24 @@
+package com.example.moviepedia.RetroApi
+
+import com.google.gson.annotations.SerializedName
+import java.util.*
+
+public  class movie {
+
+        @SerializedName("poster_path") val posterPath: String? = null
+        @SerializedName("adult") val adult = false
+        @SerializedName("overview") val overview: String? = null
+        @SerializedName("release_date") val releaseDate: String? = null
+        @SerializedName("genre_ids") val genreIds: List<Int> = ArrayList()
+        @SerializedName("id") val id: Int? = null
+        @SerializedName("original_title") val originalTitle: String? = null
+        @SerializedName("original_language") val originalLanguage: String? = null
+        @SerializedName("title") val title: String? = null
+        @SerializedName("backdrop_path") val backdropPath: String? = null
+        @SerializedName("popularity") val popularity: Double? = null
+        @SerializedName("vote_count") val voteCount: Int? = null
+        @SerializedName("video") val video: Boolean? = true
+        @SerializedName("vote_average") val voteAverage: Double? = null
+
+
+    }
