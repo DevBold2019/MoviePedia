@@ -6,12 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.moviepedia.R
-import com.example.moviepedia.RetroApi.movie
+import com.example.moviepedia.Models.movie
 
 
 class MovieAdapter(var context:Context,val list: List<movie>) : RecyclerView.Adapter<MovieAdapter.viewholder>() {
@@ -21,7 +20,7 @@ class MovieAdapter(var context:Context,val list: List<movie>) : RecyclerView.Ada
 
     interface OnItemClickListener {
 
-        fun onItemClick(cardView: CardView,  view:View,  model:movie,  position:Int)
+        fun onItemClick(cardView: CardView, view:View, model: movie, position:Int)
     }
 
     fun setOnItemClickListener(listener: OnItemClickListener?) {

@@ -1,4 +1,4 @@
-package com.example.moviepedia.RetroApi
+package com.example.moviepedia.Models
 
 import com.google.gson.annotations.SerializedName
 import java.util.*

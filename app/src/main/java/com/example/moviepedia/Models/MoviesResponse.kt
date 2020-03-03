@@ -1,6 +1,7 @@
-package com.example.moviepedia.RetroApi
+package com.example.moviepedia.Models
 
 
+import com.example.moviepedia.Models.movie
 import com.google.gson.annotations.SerializedName
 
 class MoviesResponse {
