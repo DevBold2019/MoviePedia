@@ -6,7 +6,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
@@ -16,7 +15,7 @@ import com.example.moviepedia.Models.MoviesResponse
 import com.example.moviepedia.Models.movie
 
 import com.example.moviepedia.R
-import com.example.moviepedia.Recyclers.SearchAdapter
+import com.example.moviepedia.Adapters.SearchAdapter
 import com.example.moviepedia.RetroApi.JsonRetroApi
 import retrofit2.Call
 import retrofit2.Callback

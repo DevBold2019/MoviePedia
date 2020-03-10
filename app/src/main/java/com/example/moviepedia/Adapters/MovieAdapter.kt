@@ -1,4 +1,4 @@
-package com.example.moviepedia.Recyclers
+package com.example.moviepedia.Adapters
 
 import android.content.Context
 import android.view.LayoutInflater

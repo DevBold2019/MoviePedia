@@ -1,4 +1,4 @@
-package com.example.moviepedia.Recyclers
+package com.example.moviepedia.Adapters
 
 class movieModel(val pic:String ){
 

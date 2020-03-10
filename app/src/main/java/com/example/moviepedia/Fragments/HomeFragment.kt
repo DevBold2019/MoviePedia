@@ -16,8 +16,8 @@ import com.example.moviepedia.Models.MoviesResponse
 import com.example.moviepedia.Models.movie
 
 import com.example.moviepedia.R
-import com.example.moviepedia.Recyclers.MovieAdapter
-import com.example.moviepedia.Recyclers.UpcomingAdapter
+import com.example.moviepedia.Adapters.MovieAdapter
+import com.example.moviepedia.Adapters.UpcomingAdapter
 import com.example.moviepedia.RetroApi.JsonRetroApi
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import retrofit2.Call
