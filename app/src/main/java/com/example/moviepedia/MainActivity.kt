@@ -50,7 +50,6 @@ class MainActivity : AppCompatActivity() {
 
                         val fragment:Fragment=HomeFragment()
                         supportActionBar!!.setTitle("Home")
-                        Toast.makeText(applicationContext,"Home Selected",Toast.LENGTH_LONG).show()
                         supportFragmentManager.beginTransaction().replace(R.id.contentPage, fragment).commit()
 
                     }

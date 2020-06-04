@@ -38,15 +38,8 @@ class ExploreFragment : Fragment() {
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-
-
-
-
         // Inflate the layout for this fragment
         val view:View= inflater.inflate(R.layout.fragment_explore, container, false)
-
-
-
 
         key="88343a4758ad5bd50971e643e2f2b7de"
 
@@ -54,15 +47,13 @@ class ExploreFragment : Fragment() {
         recyclerView=view.findViewById(R.id.resultsRecyclerView)
         textView=view.findViewById(R.id.resultsText)
 
-
-
         recyclerView.layoutManager= LinearLayoutManager(container!!.context)
         recyclerView.setHasFixedSize(true)
 
 
 
         retrofit=Retrofit.Builder()
-            .baseUrl("http://api.themoviedb.org/3/")
+            .baseUrl("http://api.themoviedb.org/3/search/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
@@ -111,13 +102,14 @@ class ExploreFragment : Fragment() {
 
                 }
 
-                textView.setText("Results Found")
+                textView.text=("\t"+"Results Found")
 
                 val list: MutableList<movie>
                 list= (response.body()!!.results as MutableList<movie>?)!!
 
                 for (data in list){
 
+                    textView.text=(list.size.toString()+"\t"+"Results Found")
                     adapter= SearchAdapter(list,context!!)
                     recyclerView.adapter=adapter
                     adapter.notifyDataSetChanged()

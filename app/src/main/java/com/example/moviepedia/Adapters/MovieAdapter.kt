@@ -1,16 +1,21 @@
 package com.example.moviepedia.Adapters
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
+import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.moviepedia.R
 import com.example.moviepedia.Models.movie
+import com.example.moviepedia.MoreDetailsActivity
 
 
 class MovieAdapter(var context:Context,val list: List<movie>) : RecyclerView.Adapter<MovieAdapter.viewholder>() {
@@ -52,9 +57,98 @@ class MovieAdapter(var context:Context,val list: List<movie>) : RecyclerView.Ada
         val pos=list[position]
 
         val poster = "https://image.tmdb.org/t/p/w500" + pos.posterPath
+        val title:String=pos.title.toString()
+        val language:String=pos.originalLanguage.toString()
+        val description:String=pos.overview.toString()
+        val id:String=pos.id.toString()
 
         holder.t1.text=pos.title
         holder.t2.text=pos.voteAverage.toString()
+        var genre:String=""
+        when(pos.genreIds[0]){
+
+            28 ->{
+               genre= "Action"
+            }
+            12 ->{
+               genre= "Action"
+            }
+            53 ->{
+                genre= "Thriller"
+            }
+
+            16 -> {
+
+                genre= "Animation"
+            }
+
+           35 -> {
+
+               genre="Comedy"
+            }
+
+           80 -> {
+
+                genre = "Crime"
+            }
+
+            99 -> {
+                genre= "Documentary"
+            }
+
+           18 -> {
+
+                genre= "Drama"
+            }
+
+            10751 -> {
+
+                genre= "Family"
+            }
+            14 -> {
+
+                genre= "Fantasy"
+            }
+            36 -> {
+
+                genre= "History"
+            }
+            27 -> {
+
+                genre= "Horror"
+            }
+            10402 -> {
+
+                genre= "Music"
+            }
+            9648 -> {
+
+                genre= "Mystery"
+            }
+            10749 -> {
+
+                genre= "Romance"
+            }
+            878 -> {
+
+                genre= "Fiction"
+            }
+            10770 -> {
+
+                genre= "Movie"
+            }
+            10752 -> {
+
+                genre= "War"
+            }
+            37 -> {
+
+                genre= "Western"
+            }
+
+        }
+
+        holder.t3.text= genre
 
 
         Glide.with(context).load(poster).placeholder(R.drawable.loading).into(holder.imageView)
@@ -62,12 +156,28 @@ class MovieAdapter(var context:Context,val list: List<movie>) : RecyclerView.Ada
         holder.card.setOnClickListener(object : View.OnClickListener {
             override fun onClick(p0: View) {
 
-                if (mListener !=null){
-
-                    mListener!!.onItemClick(holder.card,p0,pos,position)
 
 
-                }
+                val detailIntent: Intent = Intent(context, MoreDetailsActivity::class.java)
+
+                var bundle: Bundle = Bundle()
+
+                bundle.putString("poster",poster)
+                bundle.putString("title",title)
+                bundle.putString("language",language)
+                bundle.putString("description",description)
+                bundle.putString("id",id)
+
+                detailIntent.putExtras(bundle)
+                context.applicationContext.startActivity(detailIntent)
+                //startActivityForResult(,detailIntent,2)
+
+               /* if (mListener !=null){
+
+                    //mListener!!.onItemClick(holder.card,p0,pos,position)
+
+
+                }*/
 
 
             }
@@ -85,6 +195,7 @@ class MovieAdapter(var context:Context,val list: List<movie>) : RecyclerView.Ada
 
         val t1:TextView=view.findViewById(R.id.TitleMovie)
         val t2:TextView=view.findViewById(R.id.MovieRating)
+        val t3:TextView=view.findViewById(R.id.genreTextView)
 
         val card:CardView=view.findViewById(R.id.movieCard)
 

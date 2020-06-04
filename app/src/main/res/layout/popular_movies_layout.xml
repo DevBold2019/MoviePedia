@@ -13,7 +13,7 @@
         android:id="@+id/movieCard"
         android:layout_margin="5dp"
         app:cardElevation="2dp"
-        app:cardCornerRadius="10dp">
+        app:cardCornerRadius="3dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -61,6 +61,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
                 android:textColor="#000"
+                android:id="@+id/genreTextView"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:text="Action"
                 app:layout_constraintBottom_toBottomOf="parent"

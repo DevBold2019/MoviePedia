@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:elevation="8dp"
-        android:background="#f2f2f2"
+        android:id="@+id/searchCard"
+        app:cardCornerRadius="5dp"
+        app:cardBackgroundColor="@color/colorPrimaryDark"
         android:layout_margin="5dp">
 
         <LinearLayout
@@ -16,8 +20,8 @@
             android:orientation="horizontal">
 
             <ImageView
-                android:layout_width="150dp"
-                android:layout_height="150dp"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
                 android:id="@+id/searchedImage"
                 android:src="@drawable/ic_launcher_background"
                 android:scaleType="centerCrop"/>
@@ -30,7 +34,7 @@
                 android:id="@+id/searchedName"
                 android:textAlignment="textStart"
                 android:textSize="17sp"
-                android:textColor="#000"
+                android:textColor="#fff"
                 android:padding="6dp"
                 android:layout_margin="10dp"
                 android:gravity="start" />

@@ -53,9 +53,6 @@ class MyListFragment : Fragment() {
 
 
 
-
-
-
         return view
     }
 

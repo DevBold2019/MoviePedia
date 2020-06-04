@@ -1,23 +1,34 @@
 package com.example.moviepedia.Fragments
 
 
+import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.Context
+import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkInfo
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.ImageView
+import android.widget.ScrollView
+import android.widget.TextView
+import android.widget.Toast
 import androidx.cardview.widget.CardView
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.moviepedia.Models.MoviesResponse
-import com.example.moviepedia.Models.movie
-
-import com.example.moviepedia.R
 import com.example.moviepedia.Adapters.MovieAdapter
 import com.example.moviepedia.Adapters.UpcomingAdapter
+import com.example.moviepedia.Models.MoviesResponse
+import com.example.moviepedia.Models.movie
+import com.example.moviepedia.MoreDetailsActivity
+import com.example.moviepedia.R
 import com.example.moviepedia.RetroApi.JsonRetroApi
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import retrofit2.Call
@@ -25,6 +36,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+
 
 /**
  * A simple [Fragment] subclass.
@@ -45,6 +57,7 @@ class HomeFragment : Fragment() {
     lateinit var textView1: TextView
     lateinit var textView2: TextView
     lateinit var scrollView: ScrollView
+    lateinit var constraint:ConstraintLayout
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
@@ -52,8 +65,6 @@ class HomeFragment : Fragment() {
         val view:View = inflater.inflate(R.layout.fragment_home, container, false)
 
         key="88343a4758ad5bd50971e643e2f2b7de"
-
-
 
         dialog= Dialog(container!!.context)
         dialog.setContentView(R.layout.more_details_layout)
@@ -66,6 +77,10 @@ class HomeFragment : Fragment() {
         receycler3=view.findViewById(R.id.nowPlayingRecyclerView)
         textView=view.findViewById( R.id.see)
         textView1=view.findViewById( R.id.see1)
+
+        scrollView=view.findViewById(R.id.contentPage)
+        constraint=view.findViewById(R.id.progressLayout)
+
 
         receycler.layoutManager= LinearLayoutManager(container.context, LinearLayoutManager.HORIZONTAL,false)
         receycler.setHasFixedSize(true)
@@ -87,10 +102,9 @@ class HomeFragment : Fragment() {
             .build()
 
 
-        loadPopularMovies()
-        loadTopRated()
-        UpcomingMovies()
-        nowPlaying()
+
+        checkForNetwork()
+        //Toast.makeText(context,""+key,Toast.LENGTH_SHORT).show()
 
 
         return view
@@ -98,26 +112,57 @@ class HomeFragment : Fragment() {
 
     }
 
+    fun loadMovies(){
+
+        loadPopularMovies()
+        loadTopRated()
+        UpcomingMovies()
+        nowPlaying()
+
+
+    }
+    //Re usability purpose for
+    fun  populateDialog(title:String,description:String,language:String,imagePath:String){
+
+        dialog.show()
+
+        val t1:TextView=dialog.findViewById(R.id.Titles)
+        val t2:TextView=dialog.findViewById(R.id.Description)
+        val t4:TextView=dialog.findViewById(R.id.Language)
+        val imageView: ImageView =dialog.findViewById(R.id.DetailPic)
+
+
+        t1.text=title
+        t2.text=description
+        t4.text=language
+        Glide.with(context!!).load(imagePath).placeholder(R.drawable.loading).into(imageView)
+
+        val imageView1: ImageView =dialog.findViewById(R.id.closeImage)
+        imageView1.setOnClickListener(object : View.OnClickListener {
+
+            override fun onClick(p0: View?) {
+
+                dialog.dismiss()
+            }
+
+
+        })
+
+    }
+
     fun loadPopularMovies(){
-
-
 
         val jsonRetroApi: JsonRetroApi =retrofit.create(JsonRetroApi::class.java)
         val call: Call<MoviesResponse> = jsonRetroApi.getPopularMovies(key)
 
         call.enqueue(object : Callback<MoviesResponse> {
 
-
             override fun onResponse(call: Call<MoviesResponse>, response: Response<MoviesResponse>) {
 
                 if (!response.isSuccessful){
 
                     return
-
                 }
-
-
-
 
                 val list: List<movie>
                 list= response.body()!!.results!!
@@ -130,165 +175,28 @@ class HomeFragment : Fragment() {
 
                     textView.setOnClickListener(object : View.OnClickListener {
                         override fun onClick(p0: View?) {
-
-
                             receycler.scrollToPosition(list.size-1)
 
                         }
-
-
                     })
 
-
-                    adapter.setOnItemClickListener(object : MovieAdapter.OnItemClickListener {
-
-                        override fun onItemClick(cardView: CardView, view: View, model: movie, position: Int) {
-
-                            Toast.makeText(context!!,""+model.id, Toast.LENGTH_LONG).show()
-
-                            val poster = "https://image.tmdb.org/t/p/w500" + model.posterPath
-
-
-                            //Showing Related Movies
-                            /*   val jsonRetroApi:JsonRetroApi=retrofit.create(JsonRetroApi::class.java)
-                               val call: Call<MoviesResponse> = jsonRetroApi.getSimilarMovies(model.id!!.toInt(),key)
-
-
-
-                               call.enqueue(object : Callback<MoviesResponse> {
-
-
-                                   override fun onResponse(call: Call<MoviesResponse>, response: Response<MoviesResponse>) {
-
-                                       if (!response.isSuccessful){
-
-                                           return
-
-                                       }
-
-                                       scrollView.visibility=View.VISIBLE
-                                       linearLayout1.visibility=View.GONE
-
-
-
-                                       val list: List<movie>
-                                       list= response.body()!!.results!!
-
-                                       for (data in list){
-
-                                          Toast.makeText(applicationContext,"title\t"+data.title,Toast.LENGTH_LONG).show()
-
-
-                                       }
-
-                                   }
-                                   override fun onFailure(call: Call<MoviesResponse?>, t: Throwable) {
-
-                                       print(t.message.toString())
-
-                                       scrollView.visibility=View.GONE
-                                       linearLayout1.visibility=View.VISIBLE
-
-                                   }
-                               })
-   */
-
-                            dialog.show()
-
-                            val t1:TextView=dialog.findViewById(R.id.Titles)
-                            t1.text=model.title.toString()
-
-                            val t2:TextView=dialog.findViewById(R.id.Description)
-                            t2.text=model.overview
-
-                            /* val t3:TextView=dialog.findViewById(R.id.Time)
-                             t3.text=model.*/
-
-                            val t4:TextView=dialog.findViewById(R.id.Language)
-                            t4.text=model.originalLanguage
-
-
-
-                            val imageView: ImageView =dialog.findViewById(R.id.DetailPic)
-                            Glide.with(context!!).load(poster).placeholder(R.drawable.loading).into(imageView)
-
-                            val imageView1: ImageView =dialog.findViewById(R.id.closeImage)
-
-                            imageView1.setOnClickListener(object : View.OnClickListener {
-
-                                override fun onClick(p0: View?) {
-
-                                    dialog.dismiss()
-                                }
-
-
-                            })
-
-
-                            val imageView2: ImageView =dialog.findViewById(R.id.unliked)
-                            val imageView3: ImageView =dialog.findViewById(R.id.liked)
-
-                            imageView2.setOnClickListener(object : View.OnClickListener {
-
-                                override fun onClick(p0: View?) {
-
-
-
-                                    imageView3.visibility=View.VISIBLE
-                                    Toast.makeText(context!!,"Added to liked", Toast.LENGTH_LONG).show()
-
-
-                                    imageView2.visibility=View.INVISIBLE
-
-                                }
-
-
-                            })
-
-
-                            imageView3.setOnClickListener(object : View.OnClickListener {
-
-                                override fun onClick(p0: View?) {
-
-
-
-                                    imageView2.visibility=View.VISIBLE
-                                    Toast.makeText(context!!,"Removed from Likes", Toast.LENGTH_LONG).show()
-
-                                    imageView3.visibility=View.INVISIBLE
-
-                                }
-
-
-                            })
-
-                        }
-
-
-                    })
 
                 }
-
             }
             override fun onFailure(call: Call<MoviesResponse?>, t: Throwable) {
 
                 print(t.message.toString())
                 Toast.makeText(context!!,""+t.message, Toast.LENGTH_LONG).show()
 
-
             }
         })
 
-
-
     }
 
-
+    //Will work on it later
     fun loadTopRated(){
 
-
         val jsonRetroApi: JsonRetroApi =retrofit.create(JsonRetroApi::class.java)
-
         val call: Call<MoviesResponse> = jsonRetroApi.getTopRatedMovies(key)
 
         call.enqueue(object : Callback<MoviesResponse> {
@@ -296,14 +204,8 @@ class HomeFragment : Fragment() {
             override fun onResponse(call: Call<MoviesResponse>, response: Response<MoviesResponse>) {
 
                 if (! response.isSuccessful){
-
-
                     return
-
                 }
-
-
-
                 val list: List<movie>
                 list= response.body()!!.results!!
 
@@ -324,97 +226,9 @@ class HomeFragment : Fragment() {
 
                     })
 
-
-
-
-                    adapter1.setOnItemClickListener(object : MovieAdapter.OnItemClickListener {
-
-                        override fun onItemClick(cardView: CardView, view: View, model: movie, position: Int) {
-
-
-                            // Toast.makeText(applicationContext,""+model.video,Toast.LENGTH_LONG).show()
-
-                            val poster = "https://image.tmdb.org/t/p/w500" + model.posterPath
-
-
-                            dialog.show()
-
-                            val t1:TextView=dialog.findViewById(R.id.Titles)
-                            t1.text=model.title.toString()
-
-                            val t2:TextView=dialog.findViewById(R.id.Description)
-                            t2.text=model.overview
-
-                            /* val t3:TextView=dialog.findViewById(R.id.Time)
-                             t3.text=model.*/
-
-                            val t4:TextView=dialog.findViewById(R.id.Language)
-                            t4.text=model.originalLanguage
-
-
-
-                            val imageView: ImageView =dialog.findViewById(R.id.DetailPic)
-                            Glide.with(context!!).load(poster).placeholder(R.drawable.loading).into(imageView)
-
-                            val imageView1: ImageView =dialog.findViewById(R.id.closeImage)
-
-                            imageView1.setOnClickListener(object : View.OnClickListener {
-
-                                override fun onClick(p0: View?) {
-
-                                    dialog.dismiss()
-                                }
-
-
-                            })
-
-
-                            val imageView2: ImageView =dialog.findViewById(R.id.unliked)
-                            val imageView3: ImageView =dialog.findViewById(R.id.liked)
-
-                            imageView2.setOnClickListener(object : View.OnClickListener {
-
-                                override fun onClick(p0: View?) {
-
-
-
-                                    imageView3.visibility=View.VISIBLE
-                                    Toast.makeText(context!!,"Added to liked", Toast.LENGTH_LONG).show()
-
-
-                                    imageView2.visibility=View.INVISIBLE
-
-                                }
-
-
-                            })
-
-
-                            imageView3.setOnClickListener(object : View.OnClickListener {
-
-                                override fun onClick(p0: View?) {
-
-
-
-                                    imageView2.visibility=View.VISIBLE
-                                    Toast.makeText(context!!,"Removed from Likes", Toast.LENGTH_LONG).show()
-
-                                    imageView3.visibility=View.INVISIBLE
-
-                                }
-
-
-                            })
-
-                        }
-
-
-                    })
-
                 }
 
             }
-
             override fun onFailure(call: Call<MoviesResponse>, t: Throwable) {
 
                 println(t.message)
@@ -422,12 +236,7 @@ class HomeFragment : Fragment() {
 
             }
 
-
         })
-
-
-
-
 
     }
 
@@ -440,7 +249,6 @@ class HomeFragment : Fragment() {
 
         call.enqueue(object : Callback<MoviesResponse> {
 
-
             override fun onResponse(call: Call<MoviesResponse>, response: Response<MoviesResponse>) {
 
                 if (!response.isSuccessful){
@@ -448,10 +256,6 @@ class HomeFragment : Fragment() {
                     return
 
                 }
-
-
-
-
                 val list: List<movie>
                 list= response.body()!!.results!!
 
@@ -461,16 +265,12 @@ class HomeFragment : Fragment() {
                     receycler2.adapter=upcomingAdapter
                     upcomingAdapter.notifyDataSetChanged()
 
-
-
                 }
-
             }
             override fun onFailure(call: Call<MoviesResponse?>, t: Throwable) {
 
                 print(t.message.toString())
                 Toast.makeText(context!!,""+t.message, Toast.LENGTH_LONG).show()
-
 
             }
         })
@@ -490,16 +290,16 @@ class HomeFragment : Fragment() {
 
         call.enqueue(object : Callback<MoviesResponse> {
 
-
             override fun onResponse(call: Call<MoviesResponse>, response: Response<MoviesResponse>) {
+
+                val list: List<movie>
 
                 if (!response.isSuccessful){
 
-                    return
 
+                    return
                 }
 
-                val list: List<movie>
                 list= response.body()!!.results!!
 
                 for (data in list){
@@ -508,134 +308,6 @@ class HomeFragment : Fragment() {
                     receycler3.adapter=adapter
                     adapter.notifyDataSetChanged()
 
-
-
-                    adapter.setOnItemClickListener(object : MovieAdapter.OnItemClickListener {
-
-                        override fun onItemClick(cardView: CardView, view: View, model: movie, position: Int) {
-
-                            Toast.makeText(context!!,""+model.id, Toast.LENGTH_LONG).show()
-
-                            val poster = "https://image.tmdb.org/t/p/w500" + model.posterPath
-
-
-                            //Showing Related Movies
-                            /*   val jsonRetroApi:JsonRetroApi=retrofit.create(JsonRetroApi::class.java)
-                               val call: Call<MoviesResponse> = jsonRetroApi.getSimilarMovies(model.id!!.toInt(),key)
-
-
-
-                               call.enqueue(object : Callback<MoviesResponse> {
-
-
-                                   override fun onResponse(call: Call<MoviesResponse>, response: Response<MoviesResponse>) {
-
-                                       if (!response.isSuccessful){
-
-                                           return
-
-                                       }
-
-                                       scrollView.visibility=View.VISIBLE
-                                       linearLayout1.visibility=View.GONE
-
-
-
-                                       val list: List<movie>
-                                       list= response.body()!!.results!!
-
-                                       for (data in list){
-
-                                          Toast.makeText(applicationContext,"title\t"+data.title,Toast.LENGTH_LONG).show()
-
-
-                                       }
-
-                                   }
-                                   override fun onFailure(call: Call<MoviesResponse?>, t: Throwable) {
-
-                                       print(t.message.toString())
-
-                                       scrollView.visibility=View.GONE
-                                       linearLayout1.visibility=View.VISIBLE
-
-                                   }
-                               })
-   */
-
-                            dialog.show()
-
-                            val t1:TextView=dialog.findViewById(R.id.Titles)
-                            t1.text=model.title.toString()
-
-                            val t2:TextView=dialog.findViewById(R.id.Description)
-                            t2.text=model.overview
-
-                            /* val t3:TextView=dialog.findViewById(R.id.Time)
-                             t3.text=model.*/
-
-                            val t4:TextView=dialog.findViewById(R.id.Language)
-                            t4.text=model.originalLanguage
-
-
-
-                            val imageView: ImageView =dialog.findViewById(R.id.DetailPic)
-                            Glide.with(context!!).load(poster).placeholder(R.drawable.loading).into(imageView)
-
-                            val imageView1: ImageView =dialog.findViewById(R.id.closeImage)
-
-                            imageView1.setOnClickListener(object : View.OnClickListener {
-
-                                override fun onClick(p0: View?) {
-
-                                    dialog.dismiss()
-                                }
-
-
-                            })
-
-
-                            val imageView2: ImageView =dialog.findViewById(R.id.unliked)
-                            val imageView3: ImageView =dialog.findViewById(R.id.liked)
-
-                            imageView2.setOnClickListener(object : View.OnClickListener {
-
-                                override fun onClick(p0: View?) {
-
-
-
-                                    imageView3.visibility=View.VISIBLE
-                                    Toast.makeText(context!!,"Added to liked", Toast.LENGTH_LONG).show()
-
-
-                                    imageView2.visibility=View.INVISIBLE
-
-                                }
-
-
-                            })
-
-
-                            imageView3.setOnClickListener(object : View.OnClickListener {
-
-                                override fun onClick(p0: View?) {
-
-
-
-                                    imageView2.visibility=View.VISIBLE
-                                    Toast.makeText(context!!,"Removed from Likes", Toast.LENGTH_LONG).show()
-
-                                    imageView3.visibility=View.INVISIBLE
-
-                                }
-
-
-                            })
-
-                        }
-
-
-                    })
 
                 }
 
@@ -649,6 +321,59 @@ class HomeFragment : Fragment() {
             }
         })
 
+
+    }
+
+    //For connectivity check if the  wifi/network is connected to the internet
+    @SuppressLint("NewApi")
+    private fun checkForNetwork(): Boolean {
+        val cm :ConnectivityManager = context!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+        val netInfo: Network? = cm.activeNetwork
+
+        //if there's network we want to load more data
+        if (netInfo != null ) {
+
+            constraint.visibility=View.GONE
+            scrollView.visibility=View.VISIBLE
+            loadMovies()
+            return true
+        }
+
+        constraint.visibility=View.VISIBLE
+        scrollView.visibility=View.GONE
+
+        Toast.makeText(context, "Check your network", Toast.LENGTH_LONG).show()
+        return false
+    }
+
+
+    //SET Timeout
+   /* fun timeout(){
+
+        val handler:Handler= Handler()
+        handler.postDelayed(object : Runnable {
+
+            override fun run() {
+
+                checkForNetwork()
+
+            }
+
+
+        },600000)
+
+        Toast.makeText(context,"Timeout Expired",Toast.LENGTH_LONG).show()
+
+    }*/
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode==1 ){
+            Toast.makeText(context,"Back",Toast.LENGTH_SHORT).show()
+
+        }
 
     }
 
