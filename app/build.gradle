@@ -4,6 +4,8 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
 
+apply plugin: 'kotlin-kapt'
+
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
@@ -22,6 +24,9 @@ android {
         }
     }
 }
+
+def room_version = "1.1.1"
+def lifecycle_version = "2.1.0"
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -47,4 +52,11 @@ dependencies {
     implementation 'com.airbnb.android:lottie:3.2.2'
     //VideoPlayer
     implementation 'com.google.android.exoplayer:exoplayer:2.7.2'
+    //Room Components
+    implementation "android.arch.persistence.room:runtime:$room_version"
+    kapt "android.arch.persistence.room:compiler:$room_version"
+
+    // Lifecycle components
+    implementation "android.arch.lifecycle:extensions:$lifecycle_version"
+    kapt "android.arch.lifecycle:compiler:$lifecycle_version"
 }

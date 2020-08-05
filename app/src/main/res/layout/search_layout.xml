@@ -10,8 +10,8 @@
         android:layout_height="wrap_content"
         android:elevation="8dp"
         android:id="@+id/searchCard"
-        app:cardCornerRadius="5dp"
-        app:cardBackgroundColor="@color/colorPrimaryDark"
+        app:cardCornerRadius="10dp"
+        app:cardBackgroundColor="@android:color/transparent"
         android:layout_margin="5dp">
 
         <LinearLayout

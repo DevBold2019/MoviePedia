@@ -14,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".MoreDetailsActivity" android:parentActivityName=".MainActivity"></activity>
-        <activity android:name=".PreviewActivity" />
+        <activity android:name=".PreviewActivity" android:launchMode="singleTop" />
         <activity android:name=".MainActivity" android:launchMode="singleTop"/>
         <activity android:name=".SplashScreen">
             <intent-filter>

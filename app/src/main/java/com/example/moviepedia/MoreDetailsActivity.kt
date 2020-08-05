@@ -1,14 +1,22 @@
 package com.example.moviepedia
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.Network
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.widget.GridLayout
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -55,11 +63,15 @@ class MoreDetailsActivity : AppCompatActivity() {
 
     lateinit var toolbar: Toolbar
     lateinit var posterImage:ImageView
+    lateinit var imageView:ImageView
     lateinit var descriptionTextView:TextView
     lateinit var  languageTextView: TextView
     lateinit var recyclerView:RecyclerView
     lateinit var adapter:MyListAdapter
     lateinit var genreTextView: TextView
+    lateinit var constraint:ConstraintLayout
+    lateinit var coord:NestedScrollView
+
      var id:Int=0
 
 
@@ -73,39 +85,20 @@ class MoreDetailsActivity : AppCompatActivity() {
         supportActionBar!!.setTitle("")
 
         posterImage=findViewById(R.id.posterImage)
+       // imageView=findViewById(R.id.description_pic)
         descriptionTextView=findViewById(R.id.Description)
         languageTextView=findViewById(R.id.Language)
         genreTextView=findViewById(R.id.genreTextView)
+        constraint=findViewById(R.id.progressLayout)
+        coord=findViewById(R.id.scroll)
 
         recyclerView=findViewById(R.id.similarMoviesRecyclerView)
         recyclerView.setHasFixedSize(false)
         recyclerView.layoutManager=GridLayoutManager(applicationContext,3)
 
+        id=getIntent().extras!!.getString("id")!!.toInt()
 
-        val poster=getIntent().extras!!.getString("poster")
-        val description=getIntent().extras!!.getString("description")
-        val language=getIntent().extras!!.getString("language")
-        val title=getIntent().extras!!.getString("title")
-        val genre=getIntent().extras!!.getString("genre")
-         id=getIntent().extras!!.getString("id")!!.toInt()
-
-
-
-
-        val titleTextView:TextView=findViewById(R.id.nameOfTheMovie)
-
-        getSimilarMovies(id)
-
-        Glide.with(applicationContext).load(poster.toString()).into(posterImage)
-        descriptionTextView.text=description.toString()
-        if (language.toString().equals("en")){
-
-            languageTextView.text="English"
-        }else{
-            languageTextView.text=language.toString()
-        }
-        titleTextView.text=title.toString()
-        genreTextView.text=genre
+        checkForNetwork(id)
 
        /* myexoplayerView=findViewById(R.id.myExoplayer)
 
@@ -133,7 +126,51 @@ class MoreDetailsActivity : AppCompatActivity() {
     }
 
 
-    fun getSimilarMovies(movieid:Int){
+    @SuppressLint("NewApi")
+    private fun checkForNetwork(Id:Int): Boolean {
+        val cm : ConnectivityManager = applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+        val netInfo: Network? = cm.activeNetwork
+
+        //if there's network we want to load more data
+        if (netInfo != null ) {
+
+            constraint.visibility= View.GONE
+            coord.visibility= View.VISIBLE
+            loadMovies(Id)
+            return true
+        }
+
+        constraint.visibility= View.VISIBLE
+        coord.visibility= View.GONE
+
+        Toast.makeText(applicationContext, "Check your network", Toast.LENGTH_LONG).show()
+
+        return false
+    }
+
+    private fun loadMovies(Id:Int) {
+
+        val poster=getIntent().extras!!.getString("poster")
+        val description=getIntent().extras!!.getString("description")
+        val language=getIntent().extras!!.getString("language")
+        val title=getIntent().extras!!.getString("title")
+        val genre=getIntent().extras!!.getString("genre")
+
+
+        val titleTextView:TextView=findViewById(R.id.nameOfTheMovie)
+
+        Glide.with(applicationContext).load(poster.toString()).into(posterImage)
+        //Glide.with(applicationContext).load(poster.toString()).into(imageView)
+
+        descriptionTextView.text=description.toString()
+        if (language.toString().equals("en")){
+            languageTextView.text="English"
+        }else{
+            languageTextView.text=language.toString()
+        }
+        titleTextView.text=title.toString()
+        genreTextView.text=genre
 
         retrofit= Retrofit.Builder()
             .baseUrl("http://api.themoviedb.org/3/movie/" )
@@ -142,42 +179,37 @@ class MoreDetailsActivity : AppCompatActivity() {
 
 
         val jsonRetroApi: JsonRetroApi =retrofit.create(JsonRetroApi::class.java)
-        val call: Call<MoviesResponse> = jsonRetroApi.getSimilarMovies(movieid,"88343a4758ad5bd50971e643e2f2b7de")
-        call.enqueue(object : Callback<MoviesResponse> {
+        val call: Call<MoviesResponse> = jsonRetroApi.getSimilarMovies(Id,"88343a4758ad5bd50971e643e2f2b7de")
+         call.enqueue(object : Callback<MoviesResponse> {
 
             override fun onResponse(call: Call<MoviesResponse>, response: Response<MoviesResponse>) {
-                if (response.isSuccessful){
+                if (!response.isSuccessful){
 
+                    toast("response not successFull: ${response.message()}")
+
+                    return
+                }
                     val list: List<movie>
                     list= response.body()!!.results!!
 
                     for (data in list){
+
 
                         adapter= MyListAdapter(applicationContext,list)
                         recyclerView.adapter=adapter
                         adapter.notifyDataSetChanged()
                     }
 
-                    return
-                }else{
-
-
-                    Toast.makeText(applicationContext,"\t"+response.message().toString(),Toast.LENGTH_SHORT).show()
-
-
-
-
-                }
-
-
-
 
             }
             override fun onFailure(call: Call<MoviesResponse>, t: Throwable) {
-                TODO("Not yet implemented")
-            }
 
+               toast("onFailure: ${t.message}")
+
+            }
         })
+
+
 
     }
 
@@ -188,6 +220,11 @@ class MoreDetailsActivity : AppCompatActivity() {
         val intent:Intent= Intent()
         setResult(2,intent)
         finish()
+    }
+
+    fun toast(message:String){
+
+        Toast.makeText(applicationContext,message,Toast.LENGTH_SHORT).show()
     }
 
 }

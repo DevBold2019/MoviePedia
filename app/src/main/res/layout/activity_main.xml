@@ -15,6 +15,7 @@
             android:id="@+id/MainToolbar"
             android:background="@color/colorPrimary"
             app:titleTextColor="#fff"
+            android:elevation="10dp"
             app:layout_constraintTop_toTopOf="parent"/>
 
 

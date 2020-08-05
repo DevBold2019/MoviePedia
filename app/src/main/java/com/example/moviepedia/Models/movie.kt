@@ -1,8 +1,11 @@
 package com.example.moviepedia.Models
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 import java.util.*
 
+@Entity(tableName = "movies_tbl")
 public  class movie {
 
         @SerializedName("poster_path") val posterPath: String? = null
@@ -19,6 +22,9 @@ public  class movie {
         @SerializedName("vote_count") val voteCount: Int? = null
         @SerializedName("video") val video: Boolean? = true
         @SerializedName("vote_average") val voteAverage: Double? = null
+
+        @PrimaryKey(autoGenerate = true)
+        var movieid:Int=0
 
 
     }

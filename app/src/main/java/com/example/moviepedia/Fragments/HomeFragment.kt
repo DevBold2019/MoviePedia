@@ -56,13 +56,21 @@ class HomeFragment : Fragment() {
     lateinit var textView: TextView
     lateinit var textView1: TextView
     lateinit var textView2: TextView
+    lateinit var textView3: TextView
+    lateinit var textView4: TextView
+    lateinit var textView5: TextView
     lateinit var scrollView: ScrollView
     lateinit var constraint:ConstraintLayout
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         // Inflate the layout for this fragment
         val view:View = inflater.inflate(R.layout.fragment_home, container, false)
+        val unicode:Int=0x1F525
+        val boom=0x1F4A5
+        val playing=0x1F4FA
+        val videoRecorder=0x1F4F9
 
         key="88343a4758ad5bd50971e643e2f2b7de"
 
@@ -77,10 +85,15 @@ class HomeFragment : Fragment() {
         receycler3=view.findViewById(R.id.nowPlayingRecyclerView)
         textView=view.findViewById( R.id.see)
         textView1=view.findViewById( R.id.see1)
+        textView2=view.findViewById( R.id.upcomingTitle)
+        textView3=view.findViewById( R.id.decribe1)
+        textView4=view.findViewById( R.id.nowPlaying)
+        textView5=view.findViewById( R.id.decribe)
 
         scrollView=view.findViewById(R.id.contentPage)
         constraint=view.findViewById(R.id.progressLayout)
 
+        //#1B1E23
 
         receycler.layoutManager= LinearLayoutManager(container.context, LinearLayoutManager.HORIZONTAL,false)
         receycler.setHasFixedSize(true)
@@ -91,10 +104,20 @@ class HomeFragment : Fragment() {
         receycler2.layoutManager= LinearLayoutManager(container.context, LinearLayoutManager.HORIZONTAL,false)
         receycler2.setHasFixedSize(true)
 
-
         receycler3.layoutManager= LinearLayoutManager(container.context, LinearLayoutManager.HORIZONTAL,false)
         receycler3.setHasFixedSize(true)
 
+        val flame=String(Character.toChars(unicode))
+        val boomEmoji=String(Character.toChars(boom))
+        val nowPlaying=String(Character.toChars(playing))
+        val popular=String(Character.toChars(videoRecorder))
+
+
+
+        textView2.text=" Upcoming $flame";
+        textView3.text=" Recommended  $boomEmoji";
+        textView4.text=" Now Playing $nowPlaying";
+        textView5.text=" Popular $popular";
 
         retrofit=Retrofit.Builder()
             .baseUrl("http://api.themoviedb.org/3/")
@@ -104,7 +127,6 @@ class HomeFragment : Fragment() {
 
 
         checkForNetwork()
-        //Toast.makeText(context,""+key,Toast.LENGTH_SHORT).show()
 
 
         return view
@@ -242,8 +264,6 @@ class HomeFragment : Fragment() {
 
     fun UpcomingMovies(){
 
-
-
         val jsonRetroApi: JsonRetroApi =retrofit.create(JsonRetroApi::class.java)
         val call: Call<MoviesResponse> = jsonRetroApi.getUpcomingMovies(key)
 
@@ -340,32 +360,23 @@ class HomeFragment : Fragment() {
             return true
         }
 
-        constraint.visibility=View.VISIBLE
-        scrollView.visibility=View.GONE
+                constraint.visibility=View.VISIBLE
+                scrollView.visibility=View.GONE
 
-        Toast.makeText(context, "Check your network", Toast.LENGTH_LONG).show()
+
+            Toast.makeText(context, "Check your network", Toast.LENGTH_LONG).show()
+            loadCachedMovies();
+
+
         return false
     }
 
-
-    //SET Timeout
-   /* fun timeout(){
-
-        val handler:Handler= Handler()
-        handler.postDelayed(object : Runnable {
-
-            override fun run() {
-
-                checkForNetwork()
-
-            }
+    private fun loadCachedMovies() {
 
 
-        },600000)
 
-        Toast.makeText(context,"Timeout Expired",Toast.LENGTH_LONG).show()
 
-    }*/
+    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -374,6 +385,20 @@ class HomeFragment : Fragment() {
             Toast.makeText(context,"Back",Toast.LENGTH_SHORT).show()
 
         }
+
+    }
+
+    val unicode:Int=0x1F525
+
+
+
+    fun getEmoji(unicode: Int): String {
+
+        return String(Character.toChars(unicode))
+    }
+
+    fun toast(message:String){
+        Toast.makeText(context,message,Toast.LENGTH_SHORT).show()
 
     }
 

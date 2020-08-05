@@ -22,6 +22,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var  bottomNav: BottomNavigationView
     lateinit var toolbar: Toolbar
     lateinit var layout:ConstraintLayout
+    //lateinit var flame:String=""
 
 
 
@@ -36,6 +37,9 @@ class MainActivity : AppCompatActivity() {
         bottomNav=findViewById(R.id.bottomNavigation)
         toolbar=findViewById(R.id.MainToolbar)
         setSupportActionBar(toolbar)
+
+
+        // Flame Emoji U+1F525
 
 
 

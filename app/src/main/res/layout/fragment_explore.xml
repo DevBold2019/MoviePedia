@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#1B1E23"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".Fragments.ExploreFragment">
 
@@ -26,6 +27,7 @@
         app:layout_constraintTop_toBottomOf="@+id/searchView"
         app:layout_constraintLeft_toLeftOf="parent"
         android:padding="8dp"
+        android:textColor="#fff"
         android:id="@+id/resultsText"
         android:layout_margin="5dp"
         android:textSize="16sp"/>
